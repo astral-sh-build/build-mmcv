@@ -10,29 +10,22 @@ import json
 from packaging.version import Version
 
 # Versions of PyTorch we actually want to include in the matrix.
+# TODO: Expand this list once builds are working.
 MMCV_SUPPORTED_TORCH_VERSIONS = [
-    "2.4.1",
-    "2.5.1",
-    "2.6.0",
     "2.7.1",
-    "2.8.0",
-    "2.9.0",
 ]
 
 ARCH_TORCH_PAIRS = {
-    "x86_64": ["2.4.1", "2.5.1", "2.6.0", "2.7.1", "2.8.0", "2.9.0"],
-    "aarch64": ["2.7.1", "2.8.0", "2.9.0"],
+    "x86_64": ["2.7.1"],
+    # TODO: Add aarch64 once x86_64 builds are working.
+    # "aarch64": ["2.7.1"],
 }
 
 # Supported Python versions for each PyTorch version.
 # See: https://github.com/pytorch/pytorch/blob/main/RELEASE.md#release-compatibility-matrix
+# TODO: Expand Python versions once builds are working.
 TORCH_PYTHON_SUPPORT = {
-    "2.4": ["3.9", "3.10", "3.11", "3.12"],
-    "2.5": ["3.9", "3.10", "3.11", "3.12"],
-    "2.6": ["3.9", "3.10", "3.11", "3.12"],
-    "2.7": ["3.9", "3.10", "3.11", "3.12", "3.13"],
-    "2.8": ["3.9", "3.10", "3.11", "3.12", "3.13"],
-    "2.9": ["3.10", "3.11", "3.12", "3.13", "3.14"],
+    "2.7": ["3.11"],
 }
 
 # Minimum and maximum CUDA versions for each PyTorch version.
@@ -47,19 +40,10 @@ PYTORCH_CUDA_RANGES: dict[str, tuple[str, str]] = {
 }
 
 # Actual CUDA versions to build against for each PyTorch version.
+# TODO: Expand CUDA versions once builds are working.
 PYTORCH_CUDA_VERSIONS: dict[tuple[str, str], list[str]] = {
-    ("2.4", "x86_64"): ["12.1", "12.4"],
-    ("2.4", "aarch64"): ["12.4"],
-    ("2.5", "x86_64"): ["12.1", "12.4"],
-    ("2.5", "aarch64"): ["12.4"],
-    ("2.6", "x86_64"): ["12.4", "12.6"],
-    ("2.6", "aarch64"): ["12.6"],
-    ("2.7", "x86_64"): ["12.6", "12.8"],
-    ("2.7", "aarch64"): ["12.8"],
-    ("2.8", "x86_64"): ["12.6", "12.8", "12.9"],
-    ("2.8", "aarch64"): ["12.9"],
-    ("2.9", "x86_64"): ["12.6", "12.8", "12.9"],
-    ("2.9", "aarch64"): ["12.6", "12.8", "12.9"],
+    ("2.7", "x86_64"): ["12.6"],
+    # ("2.7", "aarch64"): ["12.8"],
 }
 
 # CUDA architectures to build against for each PyTorch version.
