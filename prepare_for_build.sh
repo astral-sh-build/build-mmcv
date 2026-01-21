@@ -1,8 +1,8 @@
 #!/bin/bash
-# Script to prepare the build environment for mmdetection.
+# Script to prepare the build environment for mmcv.
 #
 # Example usage:
-#   ./prepare_for_build.sh v3.3.0
+#   ./prepare_for_build.sh v2.2.0
 
 set -euxo pipefail
 
@@ -12,20 +12,20 @@ export SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export ROOT=`pwd`
 
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <mmdetection-version>"
-    echo "Example: $0 v3.3.0"
+    echo "Usage: $0 <mmcv-version>"
+    echo "Example: $0 v2.2.0"
     exit 1
 fi
 
-MMDETECTION_VERSION=$1
+MMCV_VERSION=$1
 
-# Ensure that the mmdetection version is supported.
-if [ ! -d "${SCRIPT_DIR}/patches/${MMDETECTION_VERSION}" ]; then
-    echo "Error: patches/${MMDETECTION_VERSION} directory does not exist"
+# Ensure that the mmcv version is supported.
+if [ ! -d "${SCRIPT_DIR}/patches/${MMCV_VERSION}" ]; then
+    echo "Error: patches/${MMCV_VERSION} directory does not exist"
     exit 1
 fi
 
 # Apply patches.
-for patch in "${SCRIPT_DIR}/patches/${MMDETECTION_VERSION}"/*.patch; do
+for patch in "${SCRIPT_DIR}/patches/${MMCV_VERSION}"/*.patch; do
     patch -p1 -d ${ROOT} -i ${patch}
 done

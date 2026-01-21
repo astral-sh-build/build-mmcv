@@ -10,7 +10,7 @@ import json
 from packaging.version import Version
 
 # Versions of PyTorch we actually want to include in the matrix.
-MMDETECTION_SUPPORTED_TORCH_VERSIONS = [
+MMCV_SUPPORTED_TORCH_VERSIONS = [
     "2.4.1",
     "2.5.1",
     "2.6.0",
@@ -60,6 +60,31 @@ PYTORCH_CUDA_VERSIONS: dict[tuple[str, str], list[str]] = {
     ("2.8", "aarch64"): ["12.9"],
     ("2.9", "x86_64"): ["12.6", "12.8", "12.9"],
     ("2.9", "aarch64"): ["12.6", "12.8", "12.9"],
+}
+
+# CUDA architectures to build against for each PyTorch version.
+TORCH_CUDA_ARCH_LIST = {
+    # https://github.com/pytorch/pytorch/blob/d990dada86a8ad94882b5c23e859b88c0c255bda/torch/utils/cpp_extension.py#L1938
+    ("2.4", "12.1"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.4", "12.4"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    # https://github.com/pytorch/pytorch/blob/32f585d9346e316e554c8d9bf7548af9f62141fc/torch/utils/cpp_extension.py#L1937
+    ("2.5", "12.1"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.5", "12.4"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    # https://github.com/pytorch/pytorch/blob/1eba9b3aa3c43f86f4a2c807ac8e12c4a7767340/.ci/manywheel/build_cuda.sh#L60
+    ("2.6", "12.4"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.6", "12.6"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    # https://github.com/pytorch/pytorch/blob/134179474539648ba7dee1317959529fbd0e7f89/.ci/manywheel/build_cuda.sh#L55
+    ("2.7", "12.6"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.7", "12.8"): "7.0;7.5;8.0;8.6;9.0;10.0;12.0+PTX",
+    # https://github.com/pytorch/pytorch/blob/ba56102387ef21a3b04b357e5b183d48f0afefc7/.ci/manywheel/build_cuda.sh#L56
+    ("2.8", "12.6"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.8", "12.8"): "7.0;7.5;8.0;8.6;9.0;10.0;12.0+PTX",
+    ("2.8", "12.9"): "7.0;7.5;8.0;8.6;9.0;10.0;12.0+PTX",
+    # https://github.com/pytorch/pytorch/blob/0fabc3ba44823f257e70ce397d989c8de5e362c1/.ci/manywheel/build_cuda.sh#L56
+    ("2.9", "12.6"): "7.0;7.5;8.0;8.6;9.0+PTX",
+    ("2.9", "12.8"): "7.0;7.5;8.0;8.6;9.0;10.0;12.0+PTX",
+    ("2.9", "12.9"): "7.0;7.5;8.0;8.6;9.0;10.0;12.0+PTX",
+    ("2.9", "13.0"): "7.5;8.0;8.6;9.0;10.0;11.0;12.0+PTX",
 }
 
 # The glibc version to use for each PyTorch version, for manylinux builds.
@@ -118,12 +143,13 @@ def main() -> None:
     # `torch-version`: the PyTorch version as "X.Y.Z", e.g. "2.7.0"
     # `python-version`: the Python version as "3.X", e.g. "3.10"
     # `cuda-version`: the CUDA version as "X.Y.Z", e.g. "11.8.0"
+    # `cxx11-abi`: "TRUE" or "FALSE"
     # `target-arch`: the target architecture, e.g. "x86_64" or "aarch64"
 
     rows = []
     for target_arch, torch_versions in ARCH_TORCH_PAIRS.items():
         for torch_version in torch_versions:
-            if torch_version not in MMDETECTION_SUPPORTED_TORCH_VERSIONS:
+            if torch_version not in MMCV_SUPPORTED_TORCH_VERSIONS:
                 continue
 
             torch_version_parsed = Version(torch_version)
@@ -133,11 +159,21 @@ def main() -> None:
                 for cuda_version in cuda_versions:
                     cuda_version_parsed = Version(cuda_version)
 
+                    # The CXX11 ABI became the default in PyTorch 2.7.0, but was also used in
+                    # PyTorch 2.6.0 (but _only_ for the CUDA 12.6 builds).
+                    #
+                    # See: https://pytorch.org/blog/pytorch2-6/
+                    cxx11_abi = torch_version_parsed >= Version("2.7.0") or (
+                        torch_version_parsed == Version("2.6.0")
+                        and cuda_version_parsed >= Version("12.6")
+                    )
+
                     row = {
                         "target-arch": target_arch,
                         "torch-version": str(torch_version_parsed),
                         "python-version": python_version,
                         "cuda-version": cuda_version,
+                        "cxx11-abi": "TRUE" if cxx11_abi else "FALSE",
                     }
 
                     if row not in EXCLUSIONS:
@@ -184,6 +220,13 @@ def main() -> None:
         row["CI_AUDITWHEEL_EXCLUDES"] = " ".join(
             f"--exclude {lib}" for lib in auditwheel_excludes
         )
+
+        row["TORCH_CUDA_ARCH_LIST"] = TORCH_CUDA_ARCH_LIST[
+            (
+                f"{torch_version.major}.{torch_version.minor}",
+                f"{cuda_version.major}.{cuda_version.minor}",
+            )
+        ]
 
         # RUNNER: the GitHub Actions runner to use.
         if row["target-arch"] == "x86_64":
