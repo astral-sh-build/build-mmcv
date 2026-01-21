@@ -19,16 +19,6 @@ index 1234567..abcdefg 100644
 
  EXT_TYPE = ''
  try:
-@@ -39,8 +49,10 @@ try:
- def get_version():
-     version_file = 'mmcv/version.py'
-     with open(version_file, encoding='utf-8') as f:
--        exec(compile(f.read(), version_file, 'exec'))
--    return locals()['__version__']
-+        # Use explicit namespace for Python 3.13+ compatibility
-+        namespace = {}
-+        exec(compile(f.read(), version_file, 'exec'), namespace)
-+    return namespace['__version__']
 @@ -100,6 +110,11 @@ install_requires = parse_requirements()
      for main, secondary in CHOOSE_INSTALL_REQUIRES:
          install_requires.append(choose_requirement(main, secondary))
