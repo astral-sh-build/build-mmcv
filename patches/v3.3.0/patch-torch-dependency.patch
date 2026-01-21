@@ -1,0 +1,24 @@
+diff --git a/setup.py b/setup.py
+index 1234567..abcdefg 100644
+--- a/setup.py
++++ b/setup.py
+@@ -11,6 +11,9 @@ import torch
+ from torch.utils.cpp_extension import (BuildExtension, CppExtension,
+                                        CUDAExtension)
+
++TORCH_MAJOR = int(torch.__version__.split(".")[0])
++TORCH_MINOR = int(torch.__version__.split(".")[1])
++
+
+ def readme():
+     with open('README.md', encoding='utf-8') as f:
+@@ -159,7 +162,9 @@ if __name__ == '__main__':
+         ],
+         license='Apache License 2.0',
+-        install_requires=parse_requirements('requirements/runtime.txt'),
++        install_requires=[
++            f"torch=={TORCH_MAJOR}.{TORCH_MINOR}.*",
++        ] + parse_requirements('requirements/runtime.txt'),
+         extras_require={
+             'all': parse_requirements('requirements.txt'),
+             'tests': parse_requirements('requirements/tests.txt'),
