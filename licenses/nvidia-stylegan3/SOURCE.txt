@@ -1,0 +1,5 @@
+MMCV includes StyleGAN3-derived bias_act, conv2d_gradfix, filtered_lrelu, and
+upfirdn2d sources. The affected files include NVIDIA copyright notices and
+source comments pointing to NVlabs/stylegan3.
+
+Source project: https://github.com/NVlabs/stylegan3

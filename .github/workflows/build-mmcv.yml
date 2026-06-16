@@ -167,15 +167,24 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair -w /tmp/cibuildwheel/repaired_wheel {wheel} ${CI_AUDITWHEEL_EXCLUDES}"
           CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
 
-      - name: Embed SBOM into wheel
+      - name: Embed metadata into wheel
         run: |
           for wheel in dist/*.whl; do
             uv run --script build_scripts/embed_patches.py "$wheel" "build_scripts/patches/${MMCV_VERSION}" \
               --source-repo "https://github.com/open-mmlab/mmcv" \
               --source-tag "${MMCV_VERSION}" \
               --source-commit "${SOURCE_COMMIT}" \
-              --build-repo "https://github.com/astral-sh-build/build-mmdetection" \
-              --build-commit "${BUILD_COMMIT}"
+              --build-repo "https://github.com/astral-sh-build/build-mmcv" \
+              --build-commit "${BUILD_COMMIT}" \
+              --license-expression "Apache-2.0 AND LicenseRef-NVIDIA-StyleGAN2-ADA AND LicenseRef-NVIDIA-StyleGAN2-NC AND LicenseRef-NVIDIA-StyleGAN3" \
+              --license-file "LICENSE:LICENSE" \
+              --license-file "LICENSES.md:LICENSES.md" \
+              --license-file "build_scripts/licenses/nvidia-stylegan2-ada/LICENSE.txt:third-party/nvidia-stylegan2-ada/LICENSE.txt" \
+              --license-file "build_scripts/licenses/nvidia-stylegan2-ada/SOURCE.txt:third-party/nvidia-stylegan2-ada/SOURCE.txt" \
+              --license-file "build_scripts/licenses/nvidia-stylegan2-nc/LICENSE.txt:third-party/nvidia-stylegan2-nc/LICENSE.txt" \
+              --license-file "build_scripts/licenses/nvidia-stylegan2-nc/SOURCE.txt:third-party/nvidia-stylegan2-nc/SOURCE.txt" \
+              --license-file "build_scripts/licenses/nvidia-stylegan3/LICENSE.txt:third-party/nvidia-stylegan3/LICENSE.txt" \
+              --license-file "build_scripts/licenses/nvidia-stylegan3/SOURCE.txt:third-party/nvidia-stylegan3/SOURCE.txt"
           done
         env:
           MMCV_VERSION: ${{ steps.mmcv-version.outputs.version }}

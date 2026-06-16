@@ -1,0 +1,5 @@
+MMCV's mmcv/ops/csrc/pytorch/cuda/fused_bias_leakyrelu_cuda.cu states that it
+is made available under the Nvidia Source Code License-NC and references the
+StyleGAN2 fused bias activation kernel.
+
+Source project: https://github.com/NVlabs/stylegan2
