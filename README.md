@@ -10,11 +10,11 @@ version. Each wheel has a local version suffix that identifies the CUDA, PyTorch
 was built against, such as `mmcv==2.2.0+cu12.8torch2.10.0cxx11abiTRUE`, and requires the matching
 PyTorch release.
 
-Pre-built wheels are available on [Astral's GPU indexes](https://pub-ca5ccdc72d7a4f9e9f2af5929bdf5083.r2.dev/index.html).
+Pre-built wheels are available on [Astral's GPU indexes](https://wheels.astralshosted.com/index.html).
 For example, to install a CUDA 12.8 build:
 
 ```console
-$ uv add mmcv --index astral-cu128=https://pub-ca5ccdc72d7a4f9e9f2af5929bdf5083.r2.dev/simple/cu128/
+$ uv add mmcv --index astral-cu128=https://wheels.astralshosted.com/simple/cu128/
 ```
 
 This configures the index and uses it as the source for `mmcv`:
@@ -25,13 +25,13 @@ mmcv = { index = "astral-cu128" }
 
 [[tool.uv.index]]
 name = "astral-cu128"
-url = "https://pub-ca5ccdc72d7a4f9e9f2af5929bdf5083.r2.dev/simple/cu128/"
+url = "https://wheels.astralshosted.com/simple/cu128/"
 ```
 
 Or, with `uv pip`:
 
 ```console
-$ uv pip install --index https://pub-ca5ccdc72d7a4f9e9f2af5929bdf5083.r2.dev/simple/cu128/ mmcv
+$ uv pip install --index https://wheels.astralshosted.com/simple/cu128/ mmcv
 ```
 
 ## Supported versions
