@@ -1,0 +1,5 @@
+MMCV includes StyleGAN2-ADA-derived fused bias/leaky ReLU and upfirdn2d
+sources. Upstream MMCV lists these operations in LICENSES.md as carrying an
+NVIDIA license.
+
+Source project: https://github.com/NVlabs/stylegan2-ada-pytorch
